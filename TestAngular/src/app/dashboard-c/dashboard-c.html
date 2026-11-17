@@ -1,4 +1,86 @@
-<p>dashboard-c works!</p>
+<header class="page-header"><h1>Resumen académico</h1></header>
 
+<mat-form-field appearance="outline" class="filtro">
+  <mat-label>Materia</mat-label>
+  <mat-select [formControl]="materiaFiltro">
+    <mat-option [value]="null">Todas las materias</mat-option>
+    @for (materia of materias; track materia.id) {
+      <mat-option [value]="materia.id">{{ materia.nombre }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
 
-<button routerLink="/home">HOME</button>
+@if (cargando) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+@if (error) {
+
+  <p class="error">
+    {{ error }}
+    <button mat-button color="primary" (click)="cargarResumen()">Reintentar</button>
+  </p>
+
+} @else if (resumen) {
+
+  <div class="tarjetas">
+
+    <mat-card class="tarjeta" id="tarjeta-alumnos">
+      <mat-card-header>
+        <mat-card-subtitle>{{ etiquetaAlumnos }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <span class="valor">{{ valorAlumnos }}</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tarjeta" id="tarjeta-materias">
+      <mat-card-header>
+        <mat-card-subtitle>Materias registradas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <span class="valor">{{ resumen.totalMateriasRegistradas }}</span>
+        <span class="alcance">Total general, no cambia con el filtro</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tarjeta" id="tarjeta-inscripciones">
+      <mat-card-header>
+        <mat-card-subtitle>Inscripciones activas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <span class="valor">{{ resumen.totalInscripcionesActivas }}</span>
+        <span class="alcance">{{ alcanceInscripciones }}</span>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <h2>Inscripciones por materia</h2>
+
+  <div class="table-shell" role="region" aria-label="Inscripciones por materia" tabindex="0">
+<table mat-table [dataSource]="resumen.inscripcionesPorMateria" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="materia">
+      <th mat-header-cell *matHeaderCellDef> Materia </th>
+      <td mat-cell *matCellDef="let fila"> {{ fila.nombre }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="cantidad">
+      <th mat-header-cell *matHeaderCellDef> Inscripciones activas </th>
+      <td mat-cell *matCellDef="let fila">{{ fila.cantidadActivas }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell sin-resultados" [attr.colspan]="displayedColumns.length">
+        No hay materias registradas.
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+}

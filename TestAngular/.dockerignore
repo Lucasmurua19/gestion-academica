@@ -1,0 +1,7 @@
+node_modules
+dist
+.angular
+.vscode
+out-tsc
+npm-debug.log
+*.md

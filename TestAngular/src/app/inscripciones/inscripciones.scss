@@ -1,0 +1,9 @@
+:host { display: block; min-width: 0; }
+.filtro { flex: 1; min-width: 155px; }
+.filtro-alumno { display: block; flex: 1.4; min-width: 210px; }
+.barra > button { flex-shrink: 0; }
+.table-shell table { min-width: 850px; }
+.estado-activa, .estado-baja { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.estado-activa { background: #e5eddf; color: #315b35; }
+.estado-baja { background: #eeeee8; color: #707568; }
+.estado-activa::before, .estado-baja::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }

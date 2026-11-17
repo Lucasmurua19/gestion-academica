@@ -1,0 +1,12 @@
+# Contexto de construcción de la API (la raíz del repo). Se deja afuera todo lo que no hace falta
+# para compilarla: salida de compilación, el frontend y los archivos del repositorio.
+**/bin
+**/obj
+**/.vs
+**/.vscode
+**/*.user
+.git
+.github
+TestAngular
+docker
+*.md

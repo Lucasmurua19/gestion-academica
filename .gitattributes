@@ -1,0 +1,6 @@
+# Estos archivos corren dentro de contenedores Linux: siempre con saltos de línea LF,
+# aunque Git en Windows convierta el resto a CRLF.
+*.sh text eol=lf
+Dockerfile text eol=lf
+nginx.conf text eol=lf
+docker-compose.yml text eol=lf

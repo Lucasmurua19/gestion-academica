@@ -40,7 +40,7 @@ export class Home {
 
   navegarAlDashboardC(){
 
-    this.router.navigate(['/dashboardC'])
+    this.router.navigate(['/dashboard-academico'])
     
   }
 

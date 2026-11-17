@@ -1,9 +1,33 @@
-.contenedor{
-
-    height: 100px;
-    width: 100%;
-
-
-    background-color: lightcoral;
-
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 232px;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  padding: 32px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  overflow-y: auto;
+}
+.brand { margin: 0 12px 36px; font-size: 24px; font-weight: 600; text-decoration: none; }
+nav { display: flex; flex-direction: column; gap: 4px; }
+nav a { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 5px; text-decoration: none; color: var(--muted); font-size: 14px; }
+nav svg { width: 18px; height: 18px; }
+nav a:hover, nav a.active { background: var(--wash); color: var(--ink); }
+nav a.active { font-weight: 600; }
+.account { margin-top: auto; padding: 20px 12px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.session-link, .register-link, .logout { font-size: 13px; text-decoration: none; color: var(--muted); }
+.session-link:hover, .register-link:hover, .logout:hover { color: var(--ink); text-decoration: underline; }
+.usuario { font-size: 12px; overflow-wrap: anywhere; }
+.logout { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
+@media (max-width: 760px) {
+  .sidebar { position: relative; width: 100%; padding: 20px 20px 0; display: grid; grid-template-columns: 1fr auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand { margin: 0; font-size: 22px; }
+  nav { grid-column: 1 / -1; grid-row: 2; flex-direction: row; overflow-x: auto; gap: 2px; margin: 18px -20px 0; padding: 0 12px 12px; }
+  nav a { white-space: nowrap; font-size: 12px; padding: 10px; gap: 6px; }
+  nav svg { width: 16px; height: 16px; }
+  .account { margin: 0; padding: 0; border: 0; flex-direction: row; align-items: center; gap: 12px; }
+  .usuario { display: none; }
+  .session-link, .register-link, .logout { font-size: 12px; }
 }

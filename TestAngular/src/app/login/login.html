@@ -1,0 +1,10 @@
+<section class="auth-layout" aria-labelledby="login-title">
+  <form class="auth-form" (ngSubmit)="ingresar()">
+    <h1 id="login-title">Iniciar sesión</h1>
+    <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput type="email" [(ngModel)]="email" name="email" autocomplete="username" required></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Contraseña</mat-label><input matInput type="password" [(ngModel)]="password" name="password" autocomplete="current-password" required></mat-form-field>
+    <p class="error" *ngIf="error" role="alert">{{ error }}</p>
+    <button class="auth-submit" mat-raised-button color="primary" type="submit" [disabled]="!email || !password">Ingresar</button>
+    <p class="auth-switch">¿No tenés cuenta? <a routerLink="/registro">Registrarse</a></p>
+  </form>
+</section>

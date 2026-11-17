@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Alumno } from '../interfaces/Alumno';
 import { CrearAlumnoDto } from '../interfaces/CrearAlumnoDto';
+import { FiltroAlumnos, PagedResult } from '../interfaces/Paginacion';
 
 
 @Injectable({
@@ -13,7 +14,7 @@ export class alumnosService {
 
   private ApiUrl: string = `${environment.apiUrl}/Alumno`;
 
-  // https://localhost:7124/api
+  // https://localhost:7197/api
 
 
   constructor(
@@ -23,9 +24,20 @@ export class alumnosService {
   ) { }
 
 
-  getAll(): Observable<Alumno[]> {
+  // GET /api/Alumno?page=1&pageSize=10&search=ana  (la búsqueda vacía no se envía)
+  getAll(filtro: FiltroAlumnos): Observable<PagedResult<Alumno>> {
 
-    return this.http.get<Alumno[]>(this.ApiUrl);
+    let params = new HttpParams()
+      .set('page', filtro.page)
+      .set('pageSize', filtro.pageSize);
+
+    const search = filtro.search?.trim();
+
+    if (search) {
+      params = params.set('search', search);
+    }
+
+    return this.http.get<PagedResult<Alumno>>(this.ApiUrl, { params });
 
   }
 
@@ -51,7 +63,7 @@ export class alumnosService {
   delete(id: number): Observable<void> {
 
     return this.http.delete<void>(`${this.ApiUrl}/${id}`);
-    
+
   }
 
 }

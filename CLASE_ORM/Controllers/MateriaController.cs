@@ -1,12 +1,15 @@
-﻿using CLASE_ORM.Entities;
-using CLASE_ORM.Entities.DTO.Materia;
-using CLASE_ORM.Interfaces;
+﻿using CLASE_ORM.Application.DTO.Materia;
+using CLASE_ORM.Application.Interfaces;
+using CLASE_ORM.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CLASE_ORM.Controllers
 {
+    // Leer: Admin o Consulta. Crear / modificar / eliminar: solo Admin.
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Roles.AdminOConsulta)]
     public class MateriaController : ControllerBase
     {
         private readonly IMateriaService _service;
@@ -18,8 +21,19 @@ namespace CLASE_ORM.Controllers
 
         }
 
+        // GET api/Materia?page=1&pageSize=10&search=mate
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] MateriaQuery query)
+        {
+
+            var materias = await _service.GetPagedAsync(query);
+            return Ok(materias);
+
+        }
+
+        // GET api/Materia/todas -> sin paginar, para llenar desplegables (ej: la materia de un alumno).
+        [HttpGet("todas")]
+        public async Task<IActionResult> GetTodas()
         {
 
             var materias = await _service.GetAllAsync();
@@ -27,41 +41,41 @@ namespace CLASE_ORM.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
 
             var materia = await _service.GetByIdAsync(id);
-            if (materia == null) return NotFound();
             return Ok(materia);
 
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> Create(CrearMateriaDto dto)
         {
 
             var created = await _service.CreateAsync(dto);
-            return Ok(created);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
 
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Materia materia)
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> Update(int id, CrearMateriaDto materia)
         {
 
-            var updated = await _service.UpdateAsync(id, materia);
-            if (!updated) return NotFound();
+            await _service.UpdateAsync(id, materia);
             return NoContent();
 
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
 
-            var deleted = await _service.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            await _service.DeleteAsync(id);
             return NoContent();
 
         }

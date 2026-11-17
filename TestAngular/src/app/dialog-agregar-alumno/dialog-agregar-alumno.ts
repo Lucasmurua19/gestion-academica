@@ -1,70 +1,60 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Alumno } from '../interfaces/Alumno';
-import { Materias } from '../interfaces/Materias';
-import { CommonModule } from '@angular/common';
-import { MatSelectModule } from '@angular/material/select';
-import { MateriaService } from '../services/materia-service';
+import { CrearAlumnoDto } from '../interfaces/CrearAlumnoDto';
+import { Observable } from 'rxjs';
+import { alumnosService } from '../services/AlumnoService';
+import { aplicarErroresDeCampo, mensajeDeControl, mostrarError } from '../utils/api-error';
 
 @Component({
   selector: 'app-alumno-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    FormsModule,
-    MatSelectModule,
+    ReactiveFormsModule,
   ],
   template: `
 
     <h2 mat-dialog-title>{{ data.alumno ? 'Editar alumno' : 'Nuevo alumno' }}</h2>
 
-    <mat-dialog-content>
+    <form [formGroup]="form" (ngSubmit)="confirmar()">
 
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="nombre" placeholder="Nombre">
-      </mat-form-field>
+      <mat-dialog-content>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="email" placeholder="Email">
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" placeholder="Nombre">
+          <mat-error>{{ mensaje('nombre') }}</mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="Email">
+          <mat-error>{{ mensaje('email') }}</mat-error>
+        </mat-form-field>
 
-        <mat-label>Materia</mat-label>
+        <p class="nota">Las materias del alumno se gestionan desde Inscripciones.</p>
 
-        <mat-select [(ngModel)]="materiaId" name="materia">
+      </mat-dialog-content>
 
-          <mat-option *ngFor="let materia of materias" [value]="materia.id">
-            
-            {{ materia.nombre }}
+      <mat-dialog-actions align="end">
 
-          </mat-option>
+        <button mat-button type="button" (click)="cancelar()">Cancelar</button>
 
-        </mat-select>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || guardando">
+          {{ data.alumno ? 'Guardar' : 'Agregar' }}
+        </button>
 
-      </mat-form-field>
+      </mat-dialog-actions>
 
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-
-      <button mat-button (click)="cancelar()">Cancelar</button>
-
-      <button mat-raised-button color="primary" (click)="confirmar()" [disabled]="!nombre || !materiaId">
-        {{ data.alumno ? 'Guardar' : 'Agregar' }}
-      </button>
-
-    </mat-dialog-actions>
+    </form>
   `,
   styles: [`
     mat-dialog-content {
@@ -73,46 +63,71 @@ import { MateriaService } from '../services/materia-service';
       gap: 8px;
       min-width: 350px;
     }
+
+    .nota {
+      margin: 0;
+      font-size: 12px;
+      opacity: 0.7;
+    }
   `]
 })
-export class AlumnoDialogComponent implements OnInit {
+export class AlumnoDialogComponent {
 
-  nombre: string = '';
-  email : string = '';
+  form = new FormGroup({
+    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)] }),
+    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(200)] }),
+  });
 
-  materiaId: number | null = null;
-
-  materias: Materias[] = [];
+  guardando = false;
 
   constructor(
     private dialogRef: MatDialogRef<AlumnoDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { alumno?: Alumno },
-    private materiaService: MateriaService
-    
+    private alumnosService: alumnosService
+
   ) {
 
+    // Al editar se precargan los datos actuales del alumno.
     if (data.alumno) {
-      this.nombre    = data.alumno.nombre;      
-      this.email = data.alumno.email;
-  
+      this.form.patchValue({
+        nombre: data.alumno.nombre,
+        email: data.alumno.email,
+      });
     }
   }
 
-  ngOnInit(): void {
-    this.materiaService.getAll().subscribe({
-      next: (data) => this.materias = data,
-      error: (err) => console.error('Error al cargar materias', err)
-    });
+  mensaje(campo: 'nombre' | 'email'): string {
+    return mensajeDeControl(this.form.controls[campo]);
   }
 
   confirmar() {
 
-    this.dialogRef.close({ 
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-      nombre: this.nombre, 
-      materiaId: this.materiaId ,
-      email: this.email
-      
+    const alumno: CrearAlumnoDto = this.form.getRawValue();
+
+    const guardar: Observable<unknown> = this.data.alumno
+      ? this.alumnosService.update(this.data.alumno.id, alumno)
+      : this.alumnosService.create(alumno);
+
+    this.guardando = true;
+
+    guardar.subscribe({
+
+      next: () => this.dialogRef.close(true),
+
+      error: (err) => {
+        this.guardando = false;
+
+        // Un 400 con errores por campo se muestra debajo de cada input; el resto (409, 500, sin conexión...) en una alerta.
+        if (!aplicarErroresDeCampo(this.form, err)) {
+          mostrarError('Error', err, 'No se pudo guardar el alumno.');
+        }
+      }
+
     });
   }
 

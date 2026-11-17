@@ -1,12 +1,7 @@
-<div class="contenedor">
-    <div class="mini-contenedor">
-
-        <button routerLink="/dashboardA" > Dashboard A </button>
-        <button  (click)="navegarAlDashboardB()"> Dashboard B </button>
-        <button matButton (click)="navegarAlDashboardC()" >Basic</button>
-        
-
-    </div>
-</div>
-
-
+<header class="page-header"><h1>Inicio</h1></header>
+<nav class="shortcut-list" aria-label="Accesos principales">
+  <a routerLink="/dashboardA"><svg aria-hidden="true"><use href="/icons.svg#people" /></svg><span>Alumnos</span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  <a routerLink="/dashboardB"><svg aria-hidden="true"><use href="/icons.svg#book" /></svg><span>Materias</span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  <a routerLink="/inscripciones"><svg aria-hidden="true"><use href="/icons.svg#enroll" /></svg><span>Inscripciones</span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+  <a routerLink="/dashboard-academico"><svg aria-hidden="true"><use href="/icons.svg#chart" /></svg><span>Resumen académico</span><span class="shortcut-arrow" aria-hidden="true">→</span></a>
+</nav>

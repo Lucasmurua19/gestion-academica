@@ -1,7 +1,7 @@
-.contenedor{
-
-    height: 75vh;
-
-    background-color: rgb(179, 142, 142);
-
-}
+.shortcut-list { max-width: 680px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.shortcut-list a { display: flex; align-items: center; gap: 14px; padding: 22px 24px; text-decoration: none; font-size: 14px; }
+.shortcut-list a + a { border-top: 1px solid var(--line); }
+.shortcut-list a:hover { background: var(--wash); }
+.shortcut-list svg { width: 20px; height: 20px; color: var(--muted); flex-shrink: 0; }
+.shortcut-arrow { margin-left: auto; color: var(--muted); }
+@media (max-width: 600px) { .shortcut-list a { padding: 20px; } }

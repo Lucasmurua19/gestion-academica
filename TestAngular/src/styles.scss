@@ -1,39 +1,74 @@
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
 html {
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  @include mat.theme((color: (primary: mat.$green-palette, tertiary: mat.$green-palette), typography: 'Segoe UI', density: -1));
+  --paper: #ffffff;
+  --canvas: #fafafa;
+  --ink: #292d32;
+  --green: #36463e;
+  --muted: #686e74;
+  --line: #e3e5e7;
+  --wash: #f1f3f3;
+  --mat-sys-primary: #36463e;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-surface: #ffffff;
+  --mat-sys-on-surface: #292d32;
+  --mat-sys-surface-container-low: #ffffff;
+  --mat-sys-surface-container: #f1f3f3;
+  --mat-sys-outline: #858b90;
+  --mat-sys-outline-variant: #e3e5e7;
 }
-
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button, input { font: inherit; }
+button, a, input, [tabindex] { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+::selection { background: #dde4df; }
+.page-header { padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.page-header h1 { font-size: 28px; font-weight: 600; margin: 0; line-height: 1.3; }
+.barra { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 22px; }
+.barra > button { order: 2; margin-left: auto; }
+.barra .mat-mdc-form-field-subscript-wrapper { display: none; }
+.filtro { min-width: 200px; }
+.table-shell { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.table-shell table { width: 100%; min-width: 540px; }
+.table-shell .mat-mdc-table { background: var(--paper); box-shadow: none; }
+.table-shell .mat-mdc-header-row { background: #f6f7f7; height: 48px; }
+.table-shell .mat-mdc-header-cell { font-size: 12px; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+.table-shell .mat-mdc-cell { font-size: 13px; border-bottom-color: var(--line); padding-top: 8px; padding-bottom: 8px; }
+.table-shell .mat-mdc-row { height: 58px; }
+.table-shell .mat-mdc-row:hover { background: #fafafa; }
+.table-shell .mat-mdc-paginator { border-top: 1px solid var(--line); background: var(--paper); font-size: 12px; }
+.table-shell .mat-column-id { width: 80px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.table-shell .mat-column-nombre { font-weight: 600; }
+.table-shell .mat-column-acciones { white-space: nowrap; }
+.sin-resultados { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; }
+.error { color: #a53c32; font-size: 13px; line-height: 1.6; }
+.mat-mdc-form-field { font-size: 14px; }
+.mat-mdc-unelevated-button, .mat-mdc-raised-button { --mdc-protected-button-container-shape: 5px; --mdc-protected-button-container-elevation-shadow: none; --mdc-protected-button-label-text-size: 13px; --mdc-protected-button-container-color: var(--green); --mdc-protected-button-label-text-color: #fff; }
+.mat-mdc-button { --mdc-text-button-label-text-size: 12px; }
+button[color='warn'] { --mdc-text-button-label-text-color: #a53c32; --mdc-protected-button-container-color: #a53c32; }
+.mat-mdc-dialog-container { --mdc-dialog-container-shape: 8px; }
+.mat-mdc-dialog-title { font-family: 'Segoe UI', Arial, sans-serif !important; font-size: 22px !important; font-weight: 600 !important; }
+.mat-mdc-dialog-content { padding-top: 12px !important; }
+.mat-mdc-dialog-content mat-form-field { width: 100%; }
+.mat-mdc-dialog-actions { padding: 16px 24px 24px !important; gap: 8px; }
+.swal2-popup { font-family: 'Segoe UI', Arial, sans-serif; border-radius: 8px; background: var(--paper); color: var(--ink); }
+.swal2-confirm { background: var(--green) !important; }
+.auth-layout { max-width: 420px; margin: 24px auto; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.auth-form { padding: 32px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.auth-form h1 { font-size: 24px; font-weight: 600; margin: 0 0 24px; }
+.auth-form .auth-submit { margin: 4px 0 10px; min-height: 44px; }
+.auth-switch { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 0; }
+.auth-switch a { color: var(--green); text-underline-offset: 4px; }
+@media (max-width: 600px) {
+  .page-header h1 { font-size: 25px; }
+  .barra { gap: 12px; }
+  .barra > button { order: 0; margin-left: 0; width: 100%; }
+  .barra > .filtro, .barra > .filtro-alumno { width: 100%; min-width: 0; }
+  .auth-layout { margin: 0 auto; }
+  .auth-form { padding: 28px 24px; }
+  .mat-mdc-dialog-content { min-width: 0 !important; }
 }
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

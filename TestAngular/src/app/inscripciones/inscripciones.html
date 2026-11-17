@@ -1,0 +1,114 @@
+<header class="page-header"><h1>Inscripciones</h1></header>
+
+<div class="barra">
+
+  @if (esAdmin) {
+    <button mat-raised-button color="primary" (click)="nuevaInscripcion()">
+      Nueva inscripción
+    </button>
+  }
+
+  <app-autocomplete-busqueda
+    class="filtro-alumno"
+    etiqueta="Alumno"
+    placeholder="Filtrar por alumno"
+    [control]="alumnoFiltro"
+    [buscar]="buscarAlumnos"
+    [texto]="textoAlumno">
+  </app-autocomplete-busqueda>
+
+  <mat-form-field appearance="outline" class="filtro">
+    <mat-label>Materia</mat-label>
+    <mat-select [formControl]="materiaFiltro">
+      <mat-option [value]="null">Todas</mat-option>
+      @for (materia of materias; track materia.id) {
+        <mat-option [value]="materia.id">{{ materia.nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filtro">
+    <mat-label>Estado</mat-label>
+    <mat-select [formControl]="estadoFiltro">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (estado of estados; track estado) {
+        <mat-option [value]="estado">{{ estado }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+</div>
+
+@if (cargando) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="table-shell" role="region" aria-label="Listado de inscripciones" tabindex="0">
+<table mat-table [dataSource]="inscripciones" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="alumno">
+    <th mat-header-cell *matHeaderCellDef> Alumno </th>
+    <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.alumnoNombre }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="materia">
+    <th mat-header-cell *matHeaderCellDef> Materia </th>
+    <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.materiaNombre }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="estado">
+    <th mat-header-cell *matHeaderCellDef> Estado </th>
+    <td mat-cell *matCellDef="let inscripcion">
+      <span [class]="inscripcion.estado === 'Activa' ? 'estado-activa' : 'estado-baja'">{{ inscripcion.estado }}</span>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="alta">
+    <th mat-header-cell *matHeaderCellDef> Fecha de alta </th>
+    <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.fechaAltaUtc | date:'dd/MM/yyyy HH:mm' }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="baja">
+    <th mat-header-cell *matHeaderCellDef> Fecha de baja </th>
+    <td mat-cell *matCellDef="let inscripcion">
+      {{ inscripcion.fechaBajaUtc ? (inscripcion.fechaBajaUtc | date:'dd/MM/yyyy HH:mm') : '—' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef> Acciones </th>
+    <td mat-cell *matCellDef="let inscripcion">
+      @if (inscripcion.estado === 'Activa') {
+        <button mat-button color="warn" (click)="darDeBaja(inscripcion)">Dar de baja</button>
+      }
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  <!-- Estados de la tabla sin filas: error, cargando o vacío -->
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell sin-resultados" [attr.colspan]="displayedColumns.length">
+      @if (errorCarga) {
+        <span class="error">{{ errorCarga }}</span>
+        <button mat-button color="primary" (click)="cargarInscripciones()">Reintentar</button>
+      } @else if (cargando) {
+        Cargando inscripciones...
+      } @else {
+        No se encontraron inscripciones.
+      }
+    </td>
+  </tr>
+
+</table>
+
+<mat-paginator
+  [length]="totalCount"
+  [pageIndex]="page - 1"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onPage($event)"
+  showFirstLastButtons>
+</mat-paginator>
+</div>
