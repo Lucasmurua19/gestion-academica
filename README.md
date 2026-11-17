@@ -107,17 +107,28 @@ La forma más simple de correr (y de presentar) el sistema: **solo hace falta Do
 
 ```bash
 docker compose up --build -d      # la primera vez tarda 5 a 10 minutos (descarga imágenes)
-docker compose run --rm seed      # opcional: 4 materias, 6 alumnos y 8 inscripciones de ejemplo
+docker compose run --rm seed      # opcional: usuarios, 8 materias, 12 alumnos y 22 inscripciones de ejemplo
 ```
 
-Después abrí **http://localhost:8080**. El administrador es `admin@demo.local` / `Admin_Demo_2026`; "Registrarse" crea usuarios de solo lectura (`Consulta`). Swagger está en `http://localhost:5201/swagger`.
+En Windows alcanza con hacer doble clic en **`INICIAR-DEMO.bat`**: levanta el sistema, carga los datos de ejemplo y abre el navegador (`INICIAR-DEMO.bat reset` borra todo y arranca de cero).
+
+Después abrí **http://localhost:8080**. Swagger está en `http://localhost:5201/swagger`. Usuarios que deja el script de datos:
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| Admin (puede crear, editar y borrar) | `admin@demo.local` | `Admin_Demo_2026` |
+| Consulta (solo lectura) | `profesor@demo.local` | `Profesor_2026` |
+| Consulta | `secretaria@demo.local` | `Secretaria_2026` |
+| Consulta | `consulta1@demo.local` y `consulta2@demo.local` | `Consulta_2026` |
+
+El administrador lo crea la API al arrancar (`AdminSeed__*` en `docker-compose.yml`); los de rol `Consulta` los registra el script por la API. "Registrarse" en la pantalla también crea usuarios `Consulta`: el rol Admin no se puede pedir por la API.
 
 | Contenedor | Qué es |
 |---|---|
 | `web` | nginx con Angular compilado para producción. Reenvía todo lo que empieza con `/api` a la API, así el navegador habla con un solo servidor (sin CORS y sin puertos fijos en el código: `environment.ts` usa `apiUrl: '/api'`). |
 | `api` | La API .NET 8. Al arrancar aplica las migraciones y crea la cuenta de administrador (`Database__MigrateOnStartup` y `AdminSeed__*`, definidos en `docker-compose.yml`). |
 | `db` | SQL Server 2022 Express. Los datos viven en un volumen y sobreviven a `docker compose down`. No publica el puerto 1433, para no chocar con un SQL Server instalado en la compu. |
-| `seed` | Un solo uso (`docker compose run --rm seed`): carga los datos de ejemplo por la API. Repetirlo no duplica nada. |
+| `seed` | Un solo uso (`docker compose run --rm seed`, script en `docker/seed-demo.sh`): registra los usuarios de la tabla de arriba y carga 8 materias, 12 alumnos y 22 inscripciones (19 activas y 3 de baja, una de ellas reinscripta) por la API. Repetirlo no duplica nada. |
 
 Comandos útiles: `docker compose ps` (estado), `docker compose logs -f api` (el log del middleware con método, ruta, estado, duración y `traceId`), `docker compose down` (apaga y conserva los datos) y `docker compose down -v` (apaga y borra todo). Si el puerto 8080 o el 5201 están ocupados, copiá `.env.example` como `.env` y cambiá `WEB_PORT` o `API_PORT`. Las contraseñas y la clave del JWT de `docker-compose.yml` son **de demostración**: para otro uso, definilas en `.env`.
 
@@ -206,7 +217,7 @@ Estado verificado el 2026-11-17:
 | Dashboard con datos conocidos | 2 alumnos, 3 materias, 3 inscripciones. Filtrando la materia con dos inscripciones se ven 2 y 2; tras una baja, esa materia muestra 1 y el total general baja de 3 a 2; la tercera materia muestra 0 con su fila. |
 | `ng build` (desarrollo y producción) | Sin errores. |
 | `ng test` | 123 de 123 pruebas pasan. |
-| Docker Compose | Las 3 imágenes se construyen y el sistema arranca solo (migraciones, administrador, nginx). El recorrido completo en el navegador real contra `http://localhost:8080` pasó sin fallas ni errores de consola. Los datos sobreviven a `docker compose down`; el script de ejemplo carga 4 materias, 6 alumnos y 8 inscripciones y no duplica al repetirse. Probado también desde cero como en otra compu: sin las imágenes, con `docker load` y `docker compose up -d`, sin descargar ni construir nada. |
+| Docker Compose | Las 3 imágenes se construyen y el sistema arranca solo (migraciones, administrador, nginx). El recorrido completo en el navegador real contra `http://localhost:8080` pasó sin fallas ni errores de consola. Los datos sobreviven a `docker compose down`; el script de ejemplo registra 4 usuarios `Consulta` (cada uno entra con su rol y recibe `403` al escribir) y carga 8 materias, 12 alumnos y 22 inscripciones, y no duplica al repetirse. `INICIAR-DEMO.bat` se probó con datos ya cargados y con `reset` desde cero. Probado también desde cero como en otra compu: sin las imágenes, con `docker load` y `docker compose up -d`, sin descargar ni construir nada. |
 | Borrados en el navegador real | Alumno o materia con una inscripción activa, o con una sola de baja: aviso con el motivo y la fila sigue en la tabla (`409`). Sin inscripciones: se elimina y desaparece de la tabla. El historial de bajas queda intacto. |
 | Navegador real (Edge) contra la API por HTTPS | Recorrido completo sin fallas: login, alta con selector con búsqueda, duplicado con su mensaje, filtros, baja con confirmación, reinscripción, dashboard con y sin filtro, usuario `Consulta` sin acciones de escritura y token inválido (vuelve al login). Sin errores en la consola del navegador, salvo los 2 esperados de la prueba del token inválido. |
 
